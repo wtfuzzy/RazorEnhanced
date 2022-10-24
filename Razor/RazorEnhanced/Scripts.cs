@@ -343,8 +343,7 @@ namespace RazorEnhanced
                             // FileChangeDate update must be the last line of threads will messup (ex: mousewheel hotkeys)
                             FileChangeDate = System.IO.File.GetLastWriteTime(fullpath);
                         }
-
-                        m_pe.Execute(m_Text);
+                        m_pe.Execute(m_Text, null, Args);
                     }
                 }
                 catch (IronPython.Runtime.Exceptions.SystemExitException)
@@ -428,6 +427,7 @@ namespace RazorEnhanced
                         }
                     }
                     catch { }
+                m_Args = null;
             }
 
             internal void Reset()
@@ -478,6 +478,26 @@ namespace RazorEnhanced
 
                         default:
                             return "Stopped";
+                    }
+                }
+            }
+
+
+            private string[] m_Args;
+            public string[] Args
+            {
+                get
+                {
+                    lock (m_Lock)
+                    {
+                        return m_Args;
+                    }
+                }
+                set
+                {
+                    lock (m_Lock)
+                    {
+                        m_Args = value;
                     }
                 }
             }

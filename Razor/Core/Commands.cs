@@ -7,6 +7,7 @@ using System.Net.NetworkInformation;
 using RazorEnhanced.UI;
 using Assistant.UI;
 using Newtonsoft.Json;
+using System.Linq;
 
 namespace Assistant
 {
@@ -27,6 +28,7 @@ namespace Assistant
             Command.Register("inspectgumps", new CommandCallback(InspectGumps));
             Command.Register("inspectalias", new CommandCallback(InspectAlias));
             Command.Register("playscript", new CommandCallback(PlayScript));
+            Command.Register("ps", new CommandCallback(PlayScriptWithArgs));
             Command.Register("hideitem", new CommandCallback(HideItem));
             Command.Register("drop", new CommandCallback(DropItem));
         }
@@ -249,20 +251,10 @@ namespace Assistant
 
             }).Start();
         }
-
-        internal static void PlayScript(string[] param)
+        internal static void realPlayScript(string scriptname, string[] args = null)
         {
-            if (param == null || param.Length == 0)
+            if (scriptname == null || scriptname.Length == 0)
                 return;
-            string scriptname = param[0];
-
-            if (param.Length > 1)
-            {
-                for (int i = 1; i < param.Length; i++)
-                {
-                    scriptname = scriptname + " " + param[i];
-                }
-            }
 
             RazorEnhanced.Scripts.EnhancedScript script = RazorEnhanced.Scripts.Search(scriptname);
             if (script != null)
@@ -270,10 +262,30 @@ namespace Assistant
                 if (script.Run)
                     script.Stop();
                 else
+                {
+                    script.Args = args;
                     script.Run = true;
+                }
             }
             else
                 RazorEnhanced.Misc.SendMessage("PlayScript: Script not exist", 33, false);
+        }
+
+        internal static void PlayScript(string[] param)
+        {
+            if (param == null || param.Length == 0)
+                return;
+            string scriptname = String.Join(" ", param);
+            realPlayScript(scriptname);
+        }
+
+        internal static void PlayScriptWithArgs(String[] param)
+        {
+            if (param == null || param.Length == 0)
+                return;
+            string scriptname = param[0];
+            string[] args = param.Skip(1).ToArray();
+            realPlayScript(param[0], args);
         }
     }
 

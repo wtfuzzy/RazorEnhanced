@@ -137,7 +137,7 @@ namespace RazorEnhanced
             CompilerOptions.Module |= ModuleOptions.Initialize;
         }
 
-        public void Execute(String text, String path=null)
+        public void Execute(String text, String path=null, String[] args = null)
         {
             if (Engine == null) return;
 
@@ -158,6 +158,7 @@ namespace RazorEnhanced
             Journal journal = Modules["Journal"] as Journal;
             journal.Active = true;
             Scope = Engine.CreateScope();
+            Scope.SetVariable("args", args);
             Compiled.Execute(Scope);
             journal.Active = false;
 
